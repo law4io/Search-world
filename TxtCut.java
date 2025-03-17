@@ -1,3 +1,28 @@
+
+不同列之间不会重叠。
+Header1 Header2 Header3
+Value1        Value3
+Value4 Value5
+Value7 Value8  Value9
+
+
+Header1 Header2 Header3
+Value1          Value3
+Value4  Value5
+Value7  Value8  Value9
+
+
+Header1 Header2 Header3
+Value1  Value2    Value3
+Value4    Value5 Value6
+Value7 Value8       Value9
+
+
+Header1     Header2    Header3
+Value1      Value2     Value3
+   Value4            Value6
+Value7  Value8
+
 import java.util.*;
 
 class ColumnBoundary {
