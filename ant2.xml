@@ -1,0 +1,53 @@
+<project name="MyProject" default="dist" basedir=".">
+    <!-- 设置项目路径 -->
+    <property name="src.dir" value="src"/>
+    <property name="build.dir" value="build"/>
+    <property name="classes.dir" value="${build.dir}/classes"/>
+    <property name="lib.dir" value="lib"/>
+    <property name="dist.dir" value="dist"/>
+    <property name="jar.name" value="myapp.jar"/>
+    <property name="manifest.file" value="src/MANIFEST.MF"/> <!-- 现有清单文件 -->
+    
+    <!-- 创建类路径引用 -->
+    <path id="classpath">
+        <fileset dir="${lib.dir}" includes="*.jar"/>
+    </path>
+    
+    <!-- 初始化任务：创建目录结构 -->
+    <target name="init">
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${classes.dir}"/>
+        <mkdir dir="${dist.dir}"/>
+    </target>
+    
+    <!-- 编译源代码 -->
+    <target name="compile" depends="init" description="编译源代码">
+        <javac srcdir="${src.dir}" 
+               destdir="${classes.dir}" 
+               classpathref="classpath" 
+               includeantruntime="false"/>
+    </target>
+    
+    <!-- 复制依赖 JAR 到 dist 目录 -->
+    <target name="copy-deps" depends="compile" description="复制依赖 JAR 到分发目录">
+        <copy todir="${dist.dir}">
+            <fileset dir="${lib.dir}" includes="*.jar"/>
+        </copy>
+    </target>
+    
+    <!-- 创建 JAR 文件，使用现有 MANIFEST.MF -->
+    <target name="jar" depends="copy-deps" description="打包 JAR 文件">
+        <jar destfile="${dist.dir}/${jar.name}" 
+             basedir="${classes.dir}" 
+             manifest="${manifest.file}"/>
+    </target>
+    
+    <!-- 清理构建文件 -->
+    <target name="clean" description="清理构建文件">
+        <delete dir="${build.dir}"/>
+        <delete dir="${dist.dir}"/>
+    </target>
+    
+    <!-- 默认目标：构建完整分发 -->
+    <target name="dist" depends="jar" description="构建完整分发"/>
+</project>
