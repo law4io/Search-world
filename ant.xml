@@ -1,0 +1,65 @@
+<project name="MyProject" default="dist" basedir=".">
+    <!-- 设置项目路径 -->
+    <property name="src.dir" value="src"/>
+    <property name="build.dir" value="build"/>
+    <property name="classes.dir" value="${build.dir}/classes"/>
+    <property name="lib.dir" value="lib"/>
+    <property name="dist.dir" value="dist"/>
+    <property name="jar.name" value="myapp.jar"/>
+    
+    <!-- 设置主类 -->
+    <property name="main.class" value="com.example.Main"/>
+    
+    <!-- 创建类路径引用（直接指向 dist 目录） -->
+    <path id="classpath">
+        <fileset dir="${lib.dir}" includes="*.jar"/>
+    </path>
+    
+    <!-- 初始化任务：创建目录结构 -->
+    <target name="init">
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${classes.dir}"/>
+        <mkdir dir="${dist.dir}"/>
+    </target>
+    
+    <!-- 编译源代码 -->
+    <target name="compile" depends="init" description="编译源代码">
+        <javac srcdir="${src.dir}" 
+               destdir="${classes.dir}" 
+               classpathref="classpath" 
+               includeantruntime="false"/>
+    </target>
+    
+    <!-- 创建 MANIFEST.MF 文件 -->
+    <target name="manifest" depends="compile" description="生成 MANIFEST.MF">
+        <manifest file="${build.dir}/MANIFEST.MF">
+            <attribute name="Main-Class" value="${main.class}"/>
+            
+            <!-- 生成不包含 lib/ 前缀的 Class-Path -->
+            <attribute name="Class-Path" value="${toString:classpath}" />
+        </manifest>
+    </target>
+    
+    <!-- 创建可执行 JAR 文件 -->
+    <target name="jar" depends="manifest" description="打包 JAR 文件">
+        <jar destfile="${dist.dir}/${jar.name}" 
+             basedir="${classes.dir}" 
+             manifest="${build.dir}/MANIFEST.MF"/>
+    </target>
+    
+    <!-- 复制依赖 JAR 到 dist 目录 -->
+    <target name="copy-deps" depends="jar" description="复制依赖 JAR 到分发目录">
+        <copy todir="${dist.dir}">
+            <fileset dir="${lib.dir}" includes="*.jar"/>
+        </copy>
+    </target>
+    
+    <!-- 清理构建文件 -->
+    <target name="clean" description="清理构建文件">
+        <delete dir="${build.dir}"/>
+        <delete dir="${dist.dir}"/>
+    </target>
+    
+    <!-- 默认目标：构建完整分发 -->
+    <target name="dist" depends="copy-deps" description="构建完整分发"/>
+</project>
